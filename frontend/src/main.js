@@ -1,4 +1,47 @@
-// eAI Cockpit — bootstrap (implementação completa na Fase 3)
 import "./styles/global.css";
+import "./styles/hud.css";
 
-document.querySelector("#cockpit-canvas").style.background = "#0A0A1A";
+import { api } from "./api/client.js";
+import { initGraph } from "./graph/renderer.js";
+import { initCamera } from "./camera/controls.js";
+import { loadLevel0, drillInto } from "./levels/navigation.js";
+import { initPanel, openPanel } from "./panel/detail.js";
+import { initHUD } from "./ui/hud.js";
+import { initSettings, loadSettings } from "./ui/settings.js";
+import { initCredits } from "./ui/credits.js";
+import { showOnboarding, hideOnboarding } from "./ui/onboarding.js";
+import { getState } from "./state/store.js";
+
+async function boot() {
+  const canvas = document.getElementById("cockpit-canvas");
+
+  initHUD();
+  initSettings();
+
+  const graph = initGraph(canvas, async (node) => {
+    const { level } = getState();
+    if (level === 0 && node.type === "workspace") {
+      drillInto(node);
+    } else {
+      openPanel(node);
+    }
+  });
+
+  initCamera(graph);
+  initPanel();
+  initCredits();
+
+  await loadSettings();
+
+  const workspaces = await api.listWorkspaces().catch(() => []);
+  if (workspaces.length === 0) {
+    showOnboarding();
+    return;
+  }
+  hideOnboarding();
+  await loadLevel0();
+}
+
+boot().catch((err) => {
+  console.error("eAI Cockpit boot error:", err);
+});
