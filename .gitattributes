@@ -1,0 +1,17 @@
+# Força LF em todos os arquivos de texto
+* text=auto eol=lf
+
+# Binários explícitos
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.mp3 binary
+*.ogg binary
+*.wav binary
+*.webp binary
