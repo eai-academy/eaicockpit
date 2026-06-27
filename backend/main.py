@@ -115,6 +115,6 @@ if _STATIC_DIR.exists():
     app.mount("/assets", StaticFiles(directory=_STATIC_DIR / "assets"), name="assets")
 
     @app.get("/{full_path:path}", include_in_schema=False)
-    async def serve_frontend(_full_path: str) -> FileResponse:
+    async def serve_frontend(full_path: str = "") -> FileResponse:
         index = _STATIC_DIR / "index.html"
         return FileResponse(index)
