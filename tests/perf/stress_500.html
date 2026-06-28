@@ -1,0 +1,75 @@
+<!doctype html>
+<!--
+  Stress test: 500 synthetic nodes.
+  Open this file via: npx serve (from frontend dir) or include in vite dev.
+  Check FPS in browser DevTools Performance tab.
+  Gate: sustained 60fps after physics freeze (~120 ticks).
+-->
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>eAI Cockpit — Stress 500 nodes</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { background: #0a0a1a; color: #e2e8f0; font-family: system-ui; }
+      #info { position: fixed; top: 12px; left: 12px; z-index: 10; font-size: 13px; opacity: 0.8; }
+      #fps  { position: fixed; top: 12px; right: 12px; z-index: 10; font-size: 18px; font-weight: bold; color: #10b981; }
+      #graph { width: 100vw; height: 100vh; }
+    </style>
+  </head>
+  <body>
+    <div id="info">Stress test — 500 nós sintéticos · aguarde física assentar</div>
+    <div id="fps">-- fps</div>
+    <div id="graph"></div>
+
+    <script type="module">
+      import ForceGraph3D from "/node_modules/3d-force-graph/dist/3d-force-graph.js";
+
+      const COLORS = ["#7C3AED", "#10B981", "#F59E0B", "#EF4444", "#06B6D4"];
+      const TYPES  = ["workspace", "video", "skill", "folder", "doc"];
+      const N = 500;
+
+      const nodes = Array.from({ length: N }, (_, i) => ({
+        id: `n${i}`,
+        label: `Node ${i}`,
+        type: TYPES[i % TYPES.length],
+        status: ["active","done","wip","pending","blocked"][i % 5],
+        color: COLORS[i % COLORS.length],
+      }));
+
+      const links = Array.from({ length: Math.floor(N * 1.2) }, (_, i) => ({
+        source: `n${Math.floor(Math.random() * N)}`,
+        target: `n${Math.floor(Math.random() * N)}`,
+        type: i % 3 === 0 ? "hierarchy" : "sibling",
+      }));
+
+      const graph = ForceGraph3D()(document.getElementById("graph"))
+        .backgroundColor("#0A0A1A")
+        .nodeColor(n => n.color)
+        .nodeVal(n => ({ workspace: 7, video: 4, skill: 4, folder: 3, doc: 2.5 }[n.type] || 4))
+        .nodeLabel(n => n.label)
+        .linkColor(() => "rgba(124,58,237,0.3)")
+        .linkWidth(0.8)
+        .linkDirectionalParticles(l => l.type === "hierarchy" ? 1 : 0)
+        .linkDirectionalParticleSpeed(0.005)
+        .linkDirectionalParticleColor(() => "#06B6D4")
+        .cooldownTicks(120)
+        .onEngineStop(() => graph.cooldownTicks(0))
+        .graphData({ nodes, links });
+
+      // FPS counter
+      let frames = 0, last = performance.now();
+      const fpsEl = document.getElementById("fps");
+      function tick() {
+        frames++;
+        const now = performance.now();
+        if (now - last >= 500) {
+          fpsEl.textContent = Math.round(frames * 1000 / (now - last)) + " fps";
+          frames = 0; last = now;
+        }
+        requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    </script>
+  </body>
+</html>

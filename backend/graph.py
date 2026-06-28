@@ -17,6 +17,9 @@ from backend.models import (
 )
 from backend.scanner import classify_node, scan_workspace
 
+# Limite de nós por nível — anti-DoS: workspace enorme não trava o cliente
+MAX_NODES_PER_LEVEL = 500
+
 
 def _node_color(status: NodeStatus) -> str:
     return STATUS_COLORS.get(status, "#7C3AED")
@@ -79,7 +82,7 @@ def _build_world(parent_id: str, workspaces: list[WorkspaceConfig]) -> Graph:
     nodes: list[Node] = []
     links: list[Link] = []
 
-    for item in items:
+    for item in items[:MAX_NODES_PER_LEVEL]:
         node_type, status = classify_node(item)
         node_id = f"{parent_id}/{item.name}"
         nodes.append(

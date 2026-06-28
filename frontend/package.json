@@ -13,10 +13,9 @@
     "format:check": "prettier --check src/"
   },
   "dependencies": {
-    "three": "^0.179.0",
+    "three": "0.185.0",
     "3d-force-graph": "^1.80.0",
-    "gsap": "^3.12.5",
-    "postprocessing": "^6.36.3"
+    "gsap": "^3.12.5"
   },
   "devDependencies": {
     "vite": "^6.3.5",

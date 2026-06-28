@@ -3,25 +3,20 @@ import { defineConfig } from "vite";
 export default defineConfig({
   root: ".",
   publicDir: "public",
+  resolve: {
+    dedupe: ["three"],
+  },
   build: {
     outDir: "dist",
     emptyOutDir: true,
     chunkSizeWarningLimit: 2000,
-    rollupOptions: {
-      input: "index.html",
-    },
+    rollupOptions: { input: "index.html" },
   },
   server: {
     port: 5173,
     proxy: {
-      "/api": {
-        target: "http://127.0.0.1:7373",
-        changeOrigin: true,
-      },
-      "/ws": {
-        target: "ws://127.0.0.1:7373",
-        ws: true,
-      },
+      "/api": { target: "http://127.0.0.1:7373", changeOrigin: true },
+      "/ws": { target: "ws://127.0.0.1:7373", ws: true },
     },
   },
 });

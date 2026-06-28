@@ -34,17 +34,23 @@ export function initCredits() {
     </div>`;
 
   document.getElementById("hud-root").appendChild(modal);
-  modal.querySelector(".credits-close").addEventListener("click", () =>
-    modal.classList.remove("open")
-  );
+  modal
+    .querySelector(".credits-close")
+    .addEventListener("click", () => modal.classList.remove("open"));
   modal.addEventListener("click", (e) => {
     if (e.target === modal) modal.classList.remove("open");
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && modal.classList.contains("open")) {
+      modal.classList.remove("open");
+    }
   });
 
   const btn = document.createElement("button");
   btn.className = "hud-btn credits-trigger";
-  btn.setAttribute("aria-label", "Sobre");
+  btn.setAttribute("aria-label", "Sobre o eAI Cockpit");
   btn.textContent = "ℹ";
   btn.addEventListener("click", () => modal.classList.toggle("open"));
-  document.getElementById("hud-bar")?.appendChild(btn);
+  // Insert into .hud-right so it sits next to the settings button
+  document.querySelector(".hud-right")?.appendChild(btn);
 }

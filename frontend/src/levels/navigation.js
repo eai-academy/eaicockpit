@@ -12,24 +12,26 @@ export async function loadLevel0() {
   resetCamera();
 }
 
-export async function drillInto(node) {
-  if (node.type !== "workspace" && getState().level === 0) return;
+export function drillInto(node) {
   if (getState().level === 1) return;
 
   animateCollapse(async () => {
-    const data = await api.getGraph(1, node.id);
-    setState({ level: 1, parentId: node.id, graphData: data });
-    updateGraphData(data);
-    updateBreadcrumb([{ label: "Galáxia", action: goBack }, { label: node.label }]);
-    animateExpand(() => focusNode(node));
+    try {
+      const data = await api.getGraph(1, node.id);
+      setState({ level: 1, parentId: node.id, graphData: data });
+      updateGraphData(data);
+      updateBreadcrumb([{ label: "Galáxia", action: goBack }, { label: node.label }]);
+      animateExpand(() => focusNode(node));
+    } catch {
+      // Se falhar, volta ao nível 0 sem crashar
+      animateExpand(null);
+    }
   });
 }
 
 export function goBack() {
-  const { level } = getState();
-  if (level === 0) return;
+  if (getState().level === 0) return;
   animateCollapse(() => {
-    loadLevel0();
-    animateExpand(null);
+    loadLevel0().then(() => animateExpand(null));
   });
 }

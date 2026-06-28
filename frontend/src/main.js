@@ -11,14 +11,15 @@ import { initSettings, loadSettings } from "./ui/settings.js";
 import { initCredits } from "./ui/credits.js";
 import { showOnboarding, hideOnboarding } from "./ui/onboarding.js";
 import { getState } from "./state/store.js";
+import { initBloom } from "./fx/bloom.js";
 
 async function boot() {
-  const canvas = document.getElementById("cockpit-canvas");
+  const container = document.getElementById("cockpit-canvas");
 
   initHUD();
   initSettings();
 
-  const graph = initGraph(canvas, async (node) => {
+  const graph = initGraph(container, async (node) => {
     const { level } = getState();
     if (level === 0 && node.type === "workspace") {
       drillInto(node);
@@ -32,6 +33,16 @@ async function boot() {
   initCredits();
 
   await loadSettings();
+
+  // Init bloom after graph renderer is ready (settings may disable it)
+  const settings = getState().settings;
+  if (settings?.bloom !== false) {
+    try {
+      initBloom(graph);
+    } catch {
+      // Bloom unavailable (e.g. WebGL context too old) — continue without it
+    }
+  }
 
   const workspaces = await api.listWorkspaces().catch(() => []);
   if (workspaces.length === 0) {

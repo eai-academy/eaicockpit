@@ -2,6 +2,7 @@ import { api } from "../api/client.js";
 import { getState, setState } from "../state/store.js";
 import { setOrbitEnabled } from "../camera/controls.js";
 import { showFPS } from "./hud.js";
+import { setBloomEnabled } from "../fx/bloom.js";
 
 export function initSettings() {
   const modal = document.createElement("div");
@@ -21,14 +22,15 @@ export function initSettings() {
     api.saveSettings(s).catch(() => {});
   });
 
-  modal.querySelector(".settings-close")?.addEventListener("click", () =>
-    modal.classList.remove("open")
-  );
+  modal
+    .querySelector(".settings-close")
+    ?.addEventListener("click", () => modal.classList.remove("open"));
 }
 
 export function applySettings(settings) {
   setOrbitEnabled(settings.auto_orbit);
   showFPS(settings.show_fps);
+  setBloomEnabled(settings.bloom);
 }
 
 export async function loadSettings() {

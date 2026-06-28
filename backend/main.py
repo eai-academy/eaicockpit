@@ -52,6 +52,9 @@ async def health() -> dict[str, str]:
 @app.get("/api/graph", response_model=Graph)
 async def get_graph(level: int = 0, parent: str | None = None) -> Graph:
     workspaces = get_workspaces()
+    # Anti-IDOR: parent must be a known workspace id
+    if parent is not None and not any(w.id == parent for w in workspaces):
+        raise HTTPException(status_code=404, detail="Parent workspace not found")
     return build_graph(workspaces, level=level, parent_id=parent)
 
 

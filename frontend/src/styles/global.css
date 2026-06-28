@@ -48,7 +48,12 @@ body {
   inset: 0;
   width: 100%;
   height: 100%;
+}
+
+#cockpit-canvas > canvas {
   display: block;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 #hud-root {
