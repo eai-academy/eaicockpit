@@ -134,6 +134,8 @@ export function updateGraphData(data) {
   if (!_graph) return;
   const nodes = data.nodes.map((n) => ({ ...n }));
   const links = data.links.map((l) => ({ ...l }));
+  // Clear first to avoid "node not found" when switching levels with stale link refs
+  _graph.graphData({ nodes: [], links: [] });
   _graph.graphData({ nodes, links });
   _graph.cooldownTicks(120);
 }
